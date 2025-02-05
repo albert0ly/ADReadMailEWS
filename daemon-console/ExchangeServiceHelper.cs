@@ -3,7 +3,6 @@ using Microsoft.Identity.Client;
 using Microsoft.Exchange.WebServices.Data;
 using System;
 using System.Threading.Tasks;
-using static daemon_console.Program;
 using System.Collections.Generic;
 
 namespace daemon_console
@@ -30,7 +29,7 @@ namespace daemon_console
         }
 
         public async Task<ExchangeService> GetExchangeServiceAsync()
-        {
+        {            
             // Initialize MSAL
             IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(_config.ClientId)
                 .WithClientSecret(_config.ClientSecret)
@@ -70,14 +69,15 @@ namespace daemon_console
             // Define the search filter and view
             ItemView view = new ItemView(10); // Fetch the top 10 emails
             
-            FindItemsResults<Item> findResults = service.FindItems(WellKnownFolderName.Inbox, searchFilterCollection, view);
+            
+            FindItemsResults<Item> findResults = await service.FindItems (WellKnownFolderName.Inbox, searchFilterCollection, view);
 
             List<EmailMessage> emails = new List<EmailMessage>();
             foreach (Item item in findResults.Items)
             {
                 if (item is EmailMessage email)
                 {
-                    email.Load(); // Load the email details
+                    await email.Load(); // Load the email details
                     emails.Add(email);
                 }
             }
